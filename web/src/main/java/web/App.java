@@ -36,18 +36,20 @@ public class App {
 		app.post("/oHo", ctx -> ctx.status(HttpCode.NO_CONTENT));
 		app.get("/hello/{message}", ctx -> ctx.result("hello " + ctx.pathParam("message")));
 		app.get("/hello/<message>", ctx -> ctx.result("hello " + ctx.pathParam("message")));
-		
-		
+
+		app.wsBefore(ws -> System.err.println("ws before "));
+		app.wsBefore("/*", ws -> System.err.println("ws before path wildcard"));
 		app.ws("/ws/communicate", ws -> {
-		    ws.onConnect(ctx -> System.out.println("Connected"));
-		    ws.onMessage(ctx -> {
-		    	String message = ctx.message();
-		    	ctx.send("hello:"+message);
-		    });
-		    ws.onError(WsErrorContext::closeSession);
-		    ws.onClose(ctx -> System.err.println(ctx.getSessionId() + " is closed"));
-		    ws.onBinaryMessage(ctx -> System.err.println("流数据"));
+			ws.onConnect(ctx -> System.out.println("Connected"));
+			ws.onMessage(ctx -> {
+				String message = ctx.message();
+				ctx.send("hello:" + message);
+			});
+			ws.onError(WsErrorContext::closeSession);
+			ws.onClose(ctx -> System.err.println(ctx.getSessionId() + " is closed"));
+			ws.onBinaryMessage(ctx -> System.err.println("流数据"));
 		});
+		app.wsAfter(ws -> System.err.println("ws after "));
 	}
 
 }
