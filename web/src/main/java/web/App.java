@@ -1,11 +1,15 @@
 package web;
 
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.path;
+
 import java.time.LocalDateTime;
 
 import commons.TimeVO;
 import io.javalin.Javalin;
 import io.javalin.http.HttpCode;
 import io.javalin.websocket.WsErrorContext;
+import web.user.controller.UserController;
 
 public class App {
 
@@ -50,6 +54,13 @@ public class App {
 			ws.onBinaryMessage(ctx -> System.err.println("流数据"));
 		});
 		app.wsAfter(ws -> System.err.println("ws after "));
+
+		app.routes(() -> {
+			path("users", () -> {
+				get(UserController::userInfo);
+				path("{id}", () -> get(UserController::getUser));
+			});
+		});
 	}
 
 }
